@@ -1,12 +1,10 @@
 <%- include("header") -%>
-<div class="contact">
+<div class="contact mb-5">
   <div class="container contact-box">
     <h1 class="contact-header"><%= title %></h1>
-
     <p class="contact-top-text">
       <%= text %>
     </p>
-
     <form action="/support" method="post">
       <div class="form-group">
         <label for="title-text-area">Name</label>
@@ -24,11 +22,6 @@
       </div>
       <button class="btn btn-outline btn-xl js-scroll-trigger" type="submit" name="button">Send</button>
     </form>
-
-
   </div>
 </div>
-
-
-
 <%- include("footer") -%>
