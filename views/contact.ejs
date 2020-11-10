@@ -1,0 +1,34 @@
+<%- include("header") -%>
+<div class="contact">
+  <div class="container contact-box">
+    <h1 class="contact-header"><%= title %></h1>
+
+    <p class="contact-top-text">
+      <%= text %>
+    </p>
+
+    <form action="/support" method="post">
+      <div class="form-group">
+        <label for="title-text-area">Name</label>
+        <input type="text" class="form-control" id="name-text-area" name="name">
+      </div>
+
+      <div class="form-group">
+        <label for="title-text-area">Email</label>
+        <input type="email" class="form-control" id="email-text-area" name="email">
+      </div>
+
+      <div class="form-group">
+        <label for="body-text-area">Message</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="10" name="message"></textarea>
+      </div>
+      <button class="btn btn-outline btn-xl js-scroll-trigger" type="submit" name="button">Send</button>
+    </form>
+
+
+  </div>
+</div>
+
+
+
+<%- include("footer") -%>
