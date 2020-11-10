@@ -30,7 +30,7 @@ app.get("/privacy-policy", (req, res) => {
 app.get("/report-bug", (req, res) => {
   res.render("contact", {
     title: "Report bug",
-    text: "Thank you for helping make Portfolio View better! I aplogise for any inconveniences the bug has caused for you and I promise that I'll fix it in the next update. Please provide as much detail as you can about the bug and how to reproduce it if possible so that I can fix it."
+    text: "I aplogise for any inconveniences the bug has caused for you and I promise that I'll fix it in the next update. Please provide as much detail as you can about the bug and how to reproduce it if possible."
   });
 });
 
