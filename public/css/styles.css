@@ -24,11 +24,11 @@ header.masthead {
   background: linear-gradient(#5680E9, #8860D0);
   height: 100vh;
   color: white;
+  padding-top: 50px;
+  padding-bottom: 750px;
 }
 
-.contact-box{
-  padding-top: 50px;
-}
+
 
 header.masthead .header-content {
   max-width: 600px;
