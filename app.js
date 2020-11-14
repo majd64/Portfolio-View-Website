@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.mongodb.net/" + process.env.DBUSER, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const app = express();
 app.use(bodyParser.urlencoded({
@@ -10,6 +13,12 @@ app.use(bodyParser.urlencoded({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + "/public"));
+
+const userSchema = new mongoose.Schema({
+  email: String
+});
+
+const User = mongoose.model("User", userSchema);
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -20,11 +29,33 @@ var transporter = nodemailer.createTransport({
 });
 
 app.get("/", (req, res) => {
+
+  var d = new Date();
+  var mailOptions = {
+    from: process.env.NODEMAILERUSER,
+    to: process.env.EMAIL,
+    subject: "WEBSITE VISITOR",
+    text: `Date: ${d.getDate()}`
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error);
+    }else{
+      console.log("email sent");
+    }
+  });
+
+
+
   res.render("home")
 });
 
 app.get("/privacy-policy", (req, res) => {
   res.render("privacy-policy")
+})
+
+app.get("/coming-soon", (req, res) => {
+  res.render("coming-soon")
 })
 
 app.get("/report-bug", (req, res) => {
@@ -60,10 +91,23 @@ app.post("/support", (req, res) => {
       console.log(error);
     }else{
       console.log("email sent");
-      res.redirect("/");
+      res.render("success", {
+        message: "Your message was received!"
+      });
     }
   });
 });
+
+app.post("/email", (req, res) => {
+  console.log("EMAIL")
+  const newUser = new User({
+    email: req.body.email
+  });
+  newUser.save();
+  res.render("success", {
+    message: "We will notify you!"
+  })
+})
 
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");

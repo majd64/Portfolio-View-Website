@@ -1,0 +1,26 @@
+<%- include("header") -%>
+
+<section class="coming-soon">
+  <div class="container text-center mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-7 ">
+        <h2 class="mb-md-5">Portfolio View will be on the App Store by the end of November!</h2>
+
+        <form class="pt-4" action="/email" method="post">
+          <h5>Want us to notify you when its out?</h5>
+          <div class="form-group">
+            <input placeholder="email" type="email" class="form-control" id="email-text-area" name="email" required>
+          </div>
+          <p class="no-spam">We will only send a single email when the app is released to the App Store and will not spam you whatsoever.</p>
+          <button class="btn btn-outline btn-xl" type="submit" name="button">Notify me!</button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+<%- include("footer") -%>

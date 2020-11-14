@@ -1,5 +1,13 @@
-html {
+html, body {
   font-family: 'Montserrat';
+  height: 100%;
+  margin: 0;
+}
+
+.wrapper{
+  min-height: 100%;
+
+  margin-bottom: -120px;
 }
 
 .navbar {
@@ -9,6 +17,19 @@ html {
 
 .carousel {
   padding: 150px 0;
+}
+
+.footer .container, .footer .row{
+  height: 100%;
+}
+
+.footer {
+  width: 100%;
+  background-color: #8860D0;
+  color: white;
+  height: 120px;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 header.masthead {
@@ -25,11 +46,15 @@ header.masthead {
   bottom: 50px;
 }
 
-.contact{
+.contact, .success, .coming-soon{
   background: linear-gradient(#5680E9, #8860D0);
   height: 100vh;
   color: white;
-  padding-top: 50px;
+  padding-top: 20px;
+}
+
+.no-spam{
+  font-size: 0.9rem;
 }
 
 header.masthead .header-content {
@@ -69,6 +94,10 @@ header.masthead .device-container {
   header.masthead .device-container {
     max-width: 425px;
   }
+
+
+
+
 }
 
 section.download {
@@ -103,13 +132,13 @@ section.download .section-heading {
     display: inline-block;
     margin-bottom: 0;
   }
-}
-
-@media (min-width: 768px) {
   section.download h2 {
     font-size: 70px;
   }
+
+
 }
+
 
 .btn-outline {
   color: white;
@@ -170,14 +199,6 @@ p {
   filter: invert(100%);
 }
 
-.footer {
-  width: 100%;
-  background-color: #8860D0;
-  color: white;
-  padding: 30px;
-  text-align: center;
-  font-size: 0.9rem;
-}
 
 .fa-circle {
   color: #5680e9;
