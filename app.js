@@ -94,7 +94,7 @@ app.get("/alerts/:devicetoken", (req, res) =>{
       res.sendStatus(500);
       return
     }
-    res.status(200).send("alerts": device.alerts)//
+    res.status(200).send({"alerts": device.alerts})//
   });
 });
 
