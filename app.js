@@ -8,8 +8,6 @@ const apn = require('apn');
 https = require('https');
 const axios = require('axios');
 
-
-
 mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.mongodb.net/" + process.env.DBUSER, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -91,7 +89,7 @@ app.post("/alerts/:devicetoken", (req, res) =>{
 
 app.get("/alerts/:devicetoken", (req, res) =>{
   console.log("FETCHED ALERTS")
-  Device.findOne({deviceToken: req.params.deviceToken}, (err, device) => {
+  Device.findOne({deviceToken: req.params.devicetoken}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
       return
