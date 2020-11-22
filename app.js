@@ -70,7 +70,7 @@ app.post("/alerts/registerdevice", (req, res) => {
 })
 
 app.post("/alerts/:devicetoken", (req, res) =>{
-  Device.findOne({deviceToken: req.params.deviceToken}, (err, device) => {
+  Device.findOne({deviceToken: req.params.devicetoken}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
       return
