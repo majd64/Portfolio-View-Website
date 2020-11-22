@@ -77,7 +77,7 @@ app.post("/alerts/:devicetoken", (req, res) =>{
     }
     device.alerts.push(
       {
-        coinID: req.body.coindID,
+        coinID: req.body.coinID,
         price: req.body.price,
         above: req.body.above
       }
