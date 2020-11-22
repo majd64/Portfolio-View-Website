@@ -54,7 +54,7 @@ let options = {
 };
 let apnProvider = new apn.Provider(options);
 
-app.post("/alerts/registerDevice", (req, res) => {
+app.post("/alerts/registerdevice", (req, res) => {
   Device.findOne({deviceToken: req.body.deviceToken}, (err, device) => {
     if (err){
       res.sendStatus(500);
@@ -71,7 +71,7 @@ app.post("/alerts/registerDevice", (req, res) => {
   })
 })
 
-app.post("/alerts/:deviceToken", (req, res) =>{
+app.post("/alerts/:devicetoken", (req, res) =>{
   Device.findOne({deviceToken: req.params.deviceToken}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -89,7 +89,7 @@ app.post("/alerts/:deviceToken", (req, res) =>{
   })
 })
 
-app.get("/alerts/:deviceToken", (req, res) =>{
+app.get("/alerts/:devicetoken", (req, res) =>{
   console.log("FETCHED ALERTS")
   Device.findOne({deviceToken: req.params.deviceToken}, (err, device) => {
     if (err || !device){
@@ -128,7 +128,7 @@ function handleAlerts(){
       }
     })
   })
-  setTimeout(handleAlerts, 5000);
+  setTimeout(handleAlerts, 12000);
 }
 
 handleAlerts()
