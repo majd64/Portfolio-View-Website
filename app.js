@@ -231,6 +231,25 @@ app.post("/email", (req, res) => {
   });
 });
 
+
+//PORTFOLIO Website
+app.post("/portfolio/contact", (req, res) => {
+  var mailOptions = {
+    from: process.env.NODEMAILERUSER,
+    to: process.env.EMAIL,
+    subject: "PERSONAL SITE CONTACT",
+    text: `Name: ${req.body.name}\nEmail: ${req.body.email}\nMessage: ${req.body.message}`
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("email sent");
+      res.redirect("majdhailat.com/success")
+    }
+  });
+});
+
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");
 });
