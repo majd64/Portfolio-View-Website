@@ -19,25 +19,21 @@ function handleAlerts(){
     if (error || !res){return}
     const users = Device.find({}, (err, users) => {
       for (i = 0; i < res.length; i++){
-        if (res[i].id === "bitcoin"){
-          console.log(res[i].price)
-        }
         const id = res[i].id;
         const price = res[i].price;
-        const symbol = res[i].ticker;
+        const symbol = res[i].symbol;
         for (j = 0; j < users.length; j++){
           const user = users[j];
           for (k = 0; k < user.alerts.length; k++){
             const alert = user.alerts[k];
             if (alert.coinID.toLowerCase() == id.toLowerCase()){
               if (price > alert.price && alert.above){
-                console.log(price + "   " + alert.price)
-                sendNotification(user.deviceToken, `${symbol} is above ${alert.price}`)
+                sendNotification(user.deviceToken, `${symbol} is above ${formatMoney(alert.price)}`)
                 user.alerts.splice(k, 1);
                 user.save();
               }
               else if (price < alert.price && !alert.above){
-                sendNotification(user.deviceToken, `${symbol} is below ${alert.price}`)
+                sendNotification(user.deviceToken, `${symbol} is below ${formatMoney(alert.price)}`)
                 user.alerts.splice(k, 1);
                 user.save();
               }
@@ -57,7 +53,7 @@ function getPrices(callback){
   axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=160&page=1&sparkline=false')
   .then(response => {
     for (i = 0; i < response.data.length; i++){
-      data.push({id: response.data[i].id, price: response.data[i].current_price})
+      data.push({id: response.data[i].id, price: response.data[i].current_price, symbol: response.data[i].symbol.toUpperCase()})
     }
     callback(data, null)
   })
@@ -126,5 +122,20 @@ router.get("/:devicetoken", (req, res) =>{
     res.status(200).send({"alerts": device.alerts})
   });
 });
+
+function formatMoney(value){
+  var minimumFractionDigits = 2
+  let decimalNumbers = value.split(".")[1]
+  if (decimalNumbers){
+    minimumFractionDigits = decimalNumbers.length
+  }
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: minimumFractionDigits
+  })
+
+  return formatter.format(value)
+}
 
 module.exports = router;
