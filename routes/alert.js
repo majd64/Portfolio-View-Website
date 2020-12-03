@@ -94,7 +94,6 @@ router.post("/registerdevice", (req, res) => {
 })
 
 router.post("/:devicetoken", (req, res) =>{
-
   Device.findOne({deviceToken: req.params.devicetoken}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -125,7 +124,7 @@ router.get("/:devicetoken", (req, res) =>{
 
 function formatMoney(value){
   var minimumFractionDigits = 2
-  let decimalNumbers = value.split(".")[1]
+  let decimalNumbers = value.toString().split(".")[1]
   if (decimalNumbers){
     minimumFractionDigits = decimalNumbers.length
   }
