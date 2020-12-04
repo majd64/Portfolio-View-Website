@@ -122,7 +122,7 @@ router.get("/:devicetoken", (req, res) =>{
 });
 
 router.post("/delete/:devicetoken", (req, res) =>{
-  User
+  Device
   .update(
     {deviceToken: req.params.devicetoken},
     { $pull: {alerts: req.body.alert_id } }
