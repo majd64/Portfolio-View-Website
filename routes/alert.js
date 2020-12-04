@@ -123,9 +123,9 @@ router.get("/:devicetoken", (req, res) =>{
 
 router.post("/delete/:devicetoken", (req, res) =>{
   Device
-  .update(
+  .updateMany(
     {deviceToken: req.params.devicetoken},
-    { $pull: {alerts: req.body.alert_id } }
+     {$pull: {alerts: {_id: req.body.alert_id}}}
   )
   .then( err => {
     if (!err){
