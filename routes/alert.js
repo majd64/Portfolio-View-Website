@@ -112,7 +112,6 @@ router.post("/:devicetoken", (req, res) =>{
 })
 
 router.get("/:devicetoken", (req, res) =>{
-  console.log("FETCHED ALERTS")
   Device.findOne({deviceToken: req.params.devicetoken}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -121,6 +120,21 @@ router.get("/:devicetoken", (req, res) =>{
     res.status(200).send({"alerts": device.alerts})
   });
 });
+
+router.post("/delete/:devicetoken", (req, res) =>{
+  User
+  .update(
+    {deviceToken: req.params.devicetoken},
+    { $pull: {alerts: req.body.alert_id } }
+  )
+  .then( err => {
+    if (!err){
+      res.sendStatus(200)
+    }else{
+      res.sendStatus(400)
+    }
+  });
+})
 
 function formatMoney(value){
   var minimumFractionDigits = 2
