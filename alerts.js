@@ -4,13 +4,14 @@ let Device = require("./models/device");
 
 let options = {
   token: {
-    key: "AuthKey_B49SAVN23T.p8",
+    key: "./AuthKey_B49SAVN23T.p8",
     keyId: "B49SAVN23T",
     teamId: "YVWM9D9TSW"
   },
   production: true
 };
 let apnProvider = new apn.Provider(options);
+console.log(process.env.NODE_ENV)
 
 function handleAlerts(){
   getPrices((res, error) => {
@@ -26,6 +27,7 @@ function handleAlerts(){
             const alert = user.alerts[k];
             if (alert.coinID.toLowerCase() == id.toLowerCase()){
               if (price > alert.price && alert.above){
+                console.log("sending")
                 sendNotification(user.deviceToken, `${symbol} is above ${formatMoney(alert.price)}`)
                 user.alerts.splice(k, 1);
                 user.save();
@@ -59,13 +61,16 @@ function getPrices(callback){
 }
 
 function sendNotification(deviceToken, alert){
+  console.log("sending")
+  console.log(deviceToken)
   let notification = new apn.Notification();
   notification.expiry = Math.floor(Date.now() / 1000) + 24 * 3600;
   notification.sound = "default";
   notification.alert = alert;
   notification.topic = "com.porfolioview.portfolioview";
   apnProvider.send(notification, deviceToken).then( result => {
-  	console.log(result.failed.response);
+    console.log("here")
+  	console.log(JSON.stringify(result));
   });
   // apnProvider.shutdown();
 }
