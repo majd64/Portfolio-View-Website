@@ -1,8 +1,6 @@
 var express = require("express");
 var router = express.Router();
-let Device = require("../models/user");
 const nodemailer = require("nodemailer");
-
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -17,14 +15,10 @@ router.get("/", (req, res) => {
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
-    subject: "WEBSITE VISITOR",
+    subject: "Portfolio View Visitor",
     text: `Date: ${d.getDate()}`
   };
-  transporter.sendMail(mailOptions, function(error, info) {
-    if (error) {
-      console.log(error);
-    }
-  });
+  transporter.sendMail(mailOptions);
   res.render("home")
 });
 
@@ -61,12 +55,14 @@ router.post("/support", (req, res) => {
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
-    subject: "PORTFOLIO VIEW EMAIL",
+    subject: "*Portfolio View Support*",
     text: `Name: ${req.body.name}\nEmail: ${req.body.email}\nMessage: ${req.body.message}`
   };
   transporter.sendMail(mailOptions, function(error, info) {
     if (error) {
-      console.log(error);
+      res.render("success", {
+        message: "An unknown error occured in the server. Please email us at support.portfolioview.ca. Sorry for the inconvenience"
+      });
     } else {
       console.log("email sent");
       res.render("success", {
@@ -83,24 +79,6 @@ router.post("/email", (req, res) => {
   newUser.save();
   res.render("success", {
     message: "We will notify you!"
-  });
-});
-
-//PORTFOLIO Website
-router.post("/portfolio/contact", (req, res) => {
-  var mailOptions = {
-    from: process.env.NODEMAILERUSER,
-    to: process.env.EMAIL,
-    subject: "PERSONAL SITE CONTACT",
-    text: `Name: ${req.body.name}\nEmail: ${req.body.email}\nMessage: ${req.body.message}`
-  };
-  transporter.sendMail(mailOptions, function(error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("email sent");
-      res.redirect("majdhailat.com/success")
-    }
   });
 });
 
