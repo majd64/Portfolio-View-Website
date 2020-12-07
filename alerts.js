@@ -65,7 +65,7 @@ function sendNotification(deviceToken, alert){
   notification.alert = alert;
   notification.topic = "com.porfolioview.portfolioview";
   apnProvider.send(notification, deviceToken).then( result => {
-  	console.log(result);
+  	console.log(result.failed.response);
   });
   // apnProvider.shutdown();
 }
