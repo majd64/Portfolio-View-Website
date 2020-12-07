@@ -52,6 +52,7 @@ router.get("/alerts/:deviceId", (req, res) =>{
   console.log("get alerts")
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
+      console.log(err)
       res.sendStatus(500);
       return
     }
