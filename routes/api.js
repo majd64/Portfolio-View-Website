@@ -10,7 +10,6 @@ router.post("/registerdevice", (req, res) => {
       return
     }
     else if(device == null){
-      console.log("new device")
       const newDevice = new Device({
         deviceId: req.body.deviceId,
         deviceToken: req.body.deviceToken
@@ -20,7 +19,6 @@ router.post("/registerdevice", (req, res) => {
       return
     }
     else if (device){
-      console.log("exisiting device")
       device.deviceToken = req.body.deviceToken
       device.save();
       res.sendStatus(200);
@@ -95,5 +93,9 @@ router.post("/session/:deviceId", (req, res) => {
     res.sendStatus(201);
   });
 });
+
+router.get("/promo", (req, res) => {
+  res.status(200).send({title: "0.01 BTC Giveaway", url: ""})
+})
 
 module.exports = router;
