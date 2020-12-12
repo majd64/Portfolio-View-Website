@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const express = require("express");
 var router = express.Router();
 
+const myDeviceId = "iuqrm5wWJHz0hgYGzly8rrjR"
+
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -52,10 +54,10 @@ async function generateReport(callback){
       var totalNumberOfProUsers = 0
       var totalNumberOfSessions = 0
 
-      await Device.estimatedDocumentCount({}, async (err, users) => {
+      await Device.countDocuments({}, async (err, users) => {
           totalNumberOfUsers = users
       })
-      await Device.estimatedDocumentCount({premium: true}, async (err, proUsers) => {
+      await Device.countDocuments({premium: true}, async (err, proUsers) => {
          totalNumberOfProUsers = proUsers
       })
       await Device.aggregate(
@@ -66,6 +68,10 @@ async function generateReport(callback){
            totalNumberOfSessions = results[0].total
         })
       )
+
+      await Device.findOne({deviceId: myDeviceId}, (err, myDevice) => {
+        totalNumberOfSessions -= myDevice.sessionCount
+      })
       const dailyReport = {
         date: date.toString(),
         totalNumberOfUsers: totalNumberOfUsers,
@@ -84,9 +90,9 @@ async function generateReport(callback){
 
 async function newDay(){
   generateReport(dailyReport => {
-    totalNumberOfSessionsYesterday = totalNumberOfSessions
-    totalNumberOfUsersYesterday = totalNumberOfUsers
-    totalNumberOfProUsersYesterday = totalNumberOfProUsers
+    totalNumberOfSessionsYesterday = dailyReport.totalNumberOfSessions
+    totalNumberOfUsersYesterday = dailyReport.totalNumberOfUsers
+    totalNumberOfProUsersYesterday = dailyReport.totalNumberOfProUsers
     var mailOptions = {
       from: process.env.NODEMAILERUSER,
       to: process.env.EMAIL,
