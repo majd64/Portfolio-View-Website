@@ -116,7 +116,7 @@ router.get("premiumpurchased", (req, res)}{
     text: `Date: ${d.getDate()}`
   };
   transporter.sendMail(mailOptions);
-  res.sendStatus(200);
+  res.sendStatus(200);//
 })
 
 module.exports = router;
