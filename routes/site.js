@@ -11,12 +11,11 @@ var transporter = nodemailer.createTransport({
 });
 
 router.get("/", (req, res) => {
-  var d = new Date();
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
     subject: "Portfolio View Visitor",
-    text: `Date: ${d.getDate()}`
+    text: `Date: ${new Date()}`
   };
   transporter.sendMail(mailOptions);
   res.render("home")
