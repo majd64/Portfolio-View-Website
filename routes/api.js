@@ -113,7 +113,7 @@ router.get("/premiumpurchased", (req, res) => {
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
-    subject: "Portfolio View Premium Purchased!",
+    subject: "Portfolio View Premium Purchased!",///
     text: `Date: ${d.getDate()}`
   };
   transporter.sendMail(mailOptions);
