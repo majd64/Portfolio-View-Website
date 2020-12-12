@@ -107,12 +107,13 @@ router.get("/promo", (req, res) => {
   res.status(200).send({title: "0.01 BTC Giveaway", url: ""})
 })
 
-router.get("premiumpurchased", (req, res) => {
+router.get("/premiumpurchased", (req, res) => {
+  console.log("remium")
   var d = new Date();
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
-    subject: "**Portfolio View Premium Purchased!**",
+    subject: "Portfolio View Premium Purchased!",
     text: `Date: ${d.getDate()}`
   };
   transporter.sendMail(mailOptions);
