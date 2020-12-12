@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const express = require("express");
 var router = express.Router();
 
-const myDeviceId = "iuqrm5wWJHz0hgYGzly8rrjR"
+const myDeviceId = "5fd46e4f675ed00004c59438"
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
