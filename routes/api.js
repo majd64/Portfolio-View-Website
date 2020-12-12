@@ -1,6 +1,15 @@
 var express = require("express");
 var router = express.Router();
 let Device = require("../models/device");
+const nodemailer = require("nodemailer");
+
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.NODEMAILERUSER,
+    pass: process.env.NODEMAILERPASS
+  }
+});
 
 router.post("/registerdevice", (req, res) => {
   console.log("regsiter device")
@@ -96,6 +105,18 @@ router.post("/session/:deviceId", (req, res) => {
 
 router.get("/promo", (req, res) => {
   res.status(200).send({title: "0.01 BTC Giveaway", url: ""})
+})
+
+router.get("premiumpurchased", (req, res)}{
+  var d = new Date();
+  var mailOptions = {
+    from: process.env.NODEMAILERUSER,
+    to: process.env.EMAIL,
+    subject: "**Portfolio View Premium Purchased!**",
+    text: `Date: ${d.getDate()}`
+  };
+  transporter.sendMail(mailOptions);
+  res.sendStatus(200);
 })
 
 module.exports = router;
