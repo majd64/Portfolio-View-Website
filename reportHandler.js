@@ -14,8 +14,8 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-var totalNumberOfSessionsYesterday = 0;
-var totalNumberOfUsersYesterday = 0;
+var totalNumberOfSessionsYesterday = 106;
+var totalNumberOfUsersYesterday = 23;
 var totalNumberOfProUsersYesterday = 0;
 
 function createReport(){
@@ -69,17 +69,22 @@ async function generateReport(callback){
         })
       )
 
-      await Device.findOne({deviceId: myDeviceId}, (err, myDevice) => {
-        totalNumberOfSessions -= myDevice.sessionCount
+      var mySessions = 0
+
+      await Device.findOne({deviceId: myDeviceId}, async (err, myDevice) => {
+          mySession = myDevice.sessionCount
       })
+      totalNumberOfSessions -= mySession
+
       const dailyReport = {
         date: date.toString(),
         totalNumberOfUsers: totalNumberOfUsers,
         numberOfNewUsersToday: (totalNumberOfUsers - totalNumberOfUsersYesterday),
-        totalNumberOfSessions: totalNumberOfSessions,
+        totalNumberOfSessions: (totalNumberOfSessions),
         numberOfNewSessionsToday: (totalNumberOfSessions - totalNumberOfSessionsYesterday),
         totalNumberOfProUsers: totalNumberOfProUsers,
-        numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfUsersYesterday)
+        numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfProUsersYesterday),
+        averageSessionsPerUser: totalNumberOfUsers / (totalNumberOfSessions - totalNumberOfSessionsYesterday)
       }
       callback(dailyReport)
     })
@@ -106,6 +111,8 @@ async function newDay(){
 
       Total pro users: ${dailyReport.totalNumberOfProUsers}
       Todays new pro users: ${dailyReport.numberOfNewProUsersToday}
+
+      Average sessions per user: ${dailyReport.averageSessionsPerUser}
       `
     };
     transporter.sendMail(mailOptions);
