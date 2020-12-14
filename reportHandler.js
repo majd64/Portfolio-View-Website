@@ -16,7 +16,7 @@ var transporter = nodemailer.createTransport({
 
 var totalNumberOfSessionsYesterday = 106;
 var totalNumberOfUsersYesterday = 23;
-var totalNumberOfProUsersYesterday = 0;
+var totalNumberOfProUsersYesterday = 1;
 
 function createReport(){
   var newReport = new Report({
@@ -84,7 +84,7 @@ async function generateReport(callback){
         numberOfNewSessionsToday: (totalNumberOfSessions - totalNumberOfSessionsYesterday),
         totalNumberOfProUsers: totalNumberOfProUsers,
         numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfProUsersYesterday),
-        averageSessionsPerUser: totalNumberOfUsers / (totalNumberOfSessions - totalNumberOfSessionsYesterday)
+        averageSessionsPerUser:  (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsers
       }
       callback(dailyReport)
     })
