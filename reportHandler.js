@@ -14,8 +14,8 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-var totalNumberOfSessionsYesterday = 278;
-var totalNumberOfUsersYesterday = 34;
+var totalNumberOfSessionsYesterday = 441;
+var totalNumberOfUsersYesterday = 49;
 var totalNumberOfProUsersYesterday = 1;
 
 function createReport(){
