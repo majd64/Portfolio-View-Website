@@ -93,6 +93,7 @@ async function generateReport(callback){
         totalNumberOfProUsers: totalNumberOfProUsers,
         numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfProUsersYesterday),
         averageSessionsPerUser:  (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsers,
+        averageSessionsPerActiveUser: (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsersActiveWithinLastWeek,
         activeUsersWithinLastDay: totalNumberOfUsersActiveWithinLastDay,
         activeUsersWithinLastWeek: totalNumberOfUsersActiveWithinLastWeek
       }
@@ -119,6 +120,7 @@ async function newDay(){
 
       Total sessions: ${dailyReport.totalNumberOfSessions}
       New sessions: ${dailyReport.numberOfNewSessionsToday}
+      Average sessions per active user: ${dailyReport.averageSessionsPerActiveUser}
       Average sessions per user: ${dailyReport.averageSessionsPerUser}
 
       Total pro users: ${dailyReport.totalNumberOfProUsers}
@@ -166,7 +168,8 @@ router.get("/", async (req, res) => {
       sessions: {
         totalSessions: report.totalNumberOfSessions,
         newSessions: report.numberOfNewSessionsToday,
-        avgSessions: report.averageSessionsPerUser
+        avgSessionsPerActiveUser: report.averageSessionsPerActiveUser.toFixed(2),
+        avgSessions: report.averageSessionsPerUser.toFixed(2)
       }
     }
     res.send(JSON.stringify(rep))
