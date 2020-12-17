@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport({
 
 var totalNumberOfSessionsYesterday = 827;
 var totalNumberOfUsersYesterday = 64;
-var totalNumberOfProUsersYesterday = 0;
+var totalNumberOfProUsersYesterday = 1;
 
 function createReport(){
   var newReport = new Report({
