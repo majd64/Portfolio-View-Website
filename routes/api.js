@@ -97,6 +97,9 @@ router.post("/session/:deviceId", (req, res) => {
       device.lastSession = req.body.lastSession
       device.premium = req.body.premium
       device.preferredCurrency = req.body.preferredCurrency
+      device.lastSessionEpochTime = Date.now();
+      device.activeWithinLastWeek = true
+      device.activeWithinLastDay = true
     }catch(err){console.log(err)}
     device.save();
     res.sendStatus(201);

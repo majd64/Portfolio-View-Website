@@ -12,7 +12,9 @@ const report = new mongoose.Schema({
     numberOfNewSessionsToday: Number,
     totalNumberOfProUsers: Number,
     numberOfNewProUsersToday: Number,
-    averageSessionsPerUser: Number
+    averageSessionsPerUser: Number,
+    activeUsersWithinLastWeek: Boolean,
+    activeUsersWithinLastDay: Boolean
   }]}
 })
 

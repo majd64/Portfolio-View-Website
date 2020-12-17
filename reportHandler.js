@@ -3,6 +3,7 @@ let Report = require("./models/report");
 const nodemailer = require("nodemailer");
 const express = require("express");
 var router = express.Router();
+var moment = require("moment");
 
 const myDeviceId = "9tXPNP4Tm3mAaUQLBpXXKo30"
 
@@ -14,9 +15,9 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-var totalNumberOfSessionsYesterday = 441;
-var totalNumberOfUsersYesterday = 49;
-var totalNumberOfProUsersYesterday = 1;
+var totalNumberOfSessionsYesterday = 827;
+var totalNumberOfUsersYesterday = 64;
+var totalNumberOfProUsersYesterday = 0;
 
 function createReport(){
   var newReport = new Report({
@@ -42,6 +43,7 @@ function handleReports() {
 }
 
 async function generateReport(callback){
+  checkActiveUsers()
   try{
     Report.findOne({reportNumber: 1}, async (err, report) => {
       if (err || !report){
@@ -53,6 +55,8 @@ async function generateReport(callback){
       var totalNumberOfUsers = 0
       var totalNumberOfProUsers = 0
       var totalNumberOfSessions = 0
+      var totalNumberOfUsersActiveWithinLastDay = 0
+      var totalNumberOfUsersActiveWithinLastWeek = 0
 
       await Device.countDocuments({}, async (err, users) => {
           totalNumberOfUsers = users
@@ -69,12 +73,17 @@ async function generateReport(callback){
         })
       )
 
-      var mySessions = 0
-
       await Device.findOne({deviceId: myDeviceId}, async (err, myDevice) => {
-          mySession = myDevice.sessionCount
+          totalNumberOfSessions -= myDevice.sessionCount
       })
-      totalNumberOfSessions -= mySession
+
+      await Device.countDocuments({activeWithinLastWeek: true}, async (err, users) => {
+        totalNumberOfUsersActiveWithinLastWeek = users
+      })
+
+      await Device.countDocuments({activeWithinLastDay: true}, async (err, users) => {
+        totalNumberOfUsersActiveWithinLastDay = users
+      })
 
       const dailyReport = {
         date: date.toString(),
@@ -84,7 +93,9 @@ async function generateReport(callback){
         numberOfNewSessionsToday: (totalNumberOfSessions - totalNumberOfSessionsYesterday),
         totalNumberOfProUsers: totalNumberOfProUsers,
         numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfProUsersYesterday),
-        averageSessionsPerUser:  (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsers
+        averageSessionsPerUser:  (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsers,
+        activeUsersWithinLastDay: totalNumberOfUsersActiveWithinLastDay,
+        activeUsersWithinLastWeek: totalNumberOfUsersActiveWithinLastWeek
       }
       callback(dailyReport)
     })
@@ -94,6 +105,7 @@ async function generateReport(callback){
 }
 
 async function newDay(){
+  await checkActiveUsers()
   generateReport(dailyReport => {
     totalNumberOfSessionsYesterday = dailyReport.totalNumberOfSessions
     totalNumberOfUsersYesterday = dailyReport.totalNumberOfUsers
@@ -104,15 +116,17 @@ async function newDay(){
       subject: `Portfolio View Daily Report Ready ${dailyReport.date}`,
       text: `
       Total users: ${dailyReport.totalNumberOfUsers}
-      Todays new users: ${dailyReport.numberOfNewUsersToday}
+      New users: ${dailyReport.numberOfNewUsersToday}
 
       Total sessions: ${dailyReport.totalNumberOfSessions}
-      Todays sessions: ${dailyReport.numberOfNewSessionsToday}
+      New sessions: ${dailyReport.numberOfNewSessionsToday}
+      Average sessions per user: ${dailyReport.averageSessionsPerUser}
 
       Total pro users: ${dailyReport.totalNumberOfProUsers}
       Todays new pro users: ${dailyReport.numberOfNewProUsersToday}
 
-      Average sessions per user: ${dailyReport.averageSessionsPerUser}
+      Active users within last week: ${dailyReport.activeUsersWithinLastWeek}
+      Active users within last day: ${dailyReport.activeUsersWithinLastDay}
       `
     };
     transporter.sendMail(mailOptions);
@@ -121,9 +135,42 @@ async function newDay(){
   });
 }
 
+async function checkActiveUsers(){
+  await Device.find(({$or: [{activeWithinLastWeek: true, activeWithinLastDay: true}]}), async (err, users) => {
+    for (var i = 0; i < users.length; i ++){
+      if (users[i].lastSessionEpochTime < (Date.now() - 8600)){
+        users[i].activeWithinLastDay = false
+      }
+      if (users[i].lastSession < (Date.now() - 60200)){
+        users[i].activeWithinLastWeek = false
+      }
+      users[i].save();
+    }
+  })
+}
+
 router.get("/", async (req, res) => {
   generateReport(report => {
-    res.send(JSON.stringify(report))
+    let rep = {
+      users: {
+        totalUsers: report.totalNumberOfUsers,
+        newUsers: report.numberOfNewUsersToday,
+      },
+      proUsers: {
+        totalProUsers: report.totalNumberOfProUsers,
+        newProUsers: report.numberOfNewProUsersToday
+      },
+      activeUsers: {
+        weekly: report.activeUsersWithinLastWeek,
+        daily: report.activeUsersWithinLastDay
+      },
+      sessions: {
+        totalSessions: report.totalNumberOfSessions,
+        newSessions: report.numberOfNewSessionsToday,
+        avgSessions: report.averageSessionsPerUser
+      }
+    }
+    res.send(JSON.stringify(rep))
   });
 
 })
