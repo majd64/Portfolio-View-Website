@@ -43,7 +43,6 @@ function handleReports() {
 }
 
 async function generateReport(callback){
-  checkActiveUsers()
   try{
     Report.findOne({reportNumber: 1}, async (err, report) => {
       if (err || !report){
@@ -141,7 +140,7 @@ async function checkActiveUsers(){
       if (users[i].lastSessionEpochTime < (Date.now() - 8600)){
         users[i].activeWithinLastDay = false
       }
-      if (users[i].lastSession < (Date.now() - 60200)){
+      if (users[i].lastSessionEpochTime < (Date.now() - 60200)){
         users[i].activeWithinLastWeek = false
       }
       users[i].save();
