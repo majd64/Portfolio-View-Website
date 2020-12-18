@@ -5,7 +5,7 @@ const express = require("express");
 var router = express.Router();
 var moment = require("moment");
 
-const myDeviceId = "9tXPNP4Tm3mAaUQLBpXXKo30"
+const myDeviceIds = ["9tXPNP4Tm3mAaUQLBpXXKo30", "4jXz54YIoviZ93GPcDfJHLq4"]
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -15,8 +15,8 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-var totalNumberOfSessionsYesterday = 827;
-var totalNumberOfUsersYesterday = 64;
+var totalNumberOfSessionsYesterday = 1221;
+var totalNumberOfUsersYesterday = 69;
 var totalNumberOfProUsersYesterday = 1;
 
 function createReport(){
@@ -68,21 +68,24 @@ async function generateReport(callback){
           {$match: {}},
           {$group: {_id: null, total: {$sum: "$sessionCount"}}}
         ], ((err, results) => {
+          console.log(results)
            totalNumberOfSessions = results[0].total
         })
       )
-
-      await Device.findOne({deviceId: myDeviceId}, async (err, myDevice) => {
-          totalNumberOfSessions -= myDevice.sessionCount
+      await Device.find({deviceId: { $in: myDeviceIds}}, async (err, myDevices) => {
+        myDevices.forEach((item, i) => {
+          totalNumberOfSessions -= item.sessionCount
+        });
       })
-
       await Device.countDocuments({activeWithinLastWeek: true}, async (err, users) => {
         totalNumberOfUsersActiveWithinLastWeek = users
       })
-
       await Device.countDocuments({activeWithinLastDay: true}, async (err, users) => {
         totalNumberOfUsersActiveWithinLastDay = users
       })
+
+      totalNumberOfUsers -= myDeviceIds.length
+      totalNumberOfProUsers -= myDeviceIds.length
 
       const dailyReport = {
         date: date.toString(),
@@ -136,14 +139,19 @@ async function newDay(){
   });
 }
 
+checkActiveUsers()
 async function checkActiveUsers(){
-  await Device.find(({$or: [{activeWithinLastWeek: true, activeWithinLastDay: true}]}), async (err, users) => {
+  await Device.find(({$or: [{activeWithinLastDay: true, activeWithinLastWeek: true}]}), async (err, users) => {
     for (var i = 0; i < users.length; i ++){
-      if (users[i].lastSessionEpochTime < (Date.now() - 8600)){
+      if (users[i].lastSessionEpochTime < (Date.now() - 86400)){
         users[i].activeWithinLastDay = false
+       }else{
+        users[i].activeWithinLastDay = true
       }
-      if (users[i].lastSessionEpochTime < (Date.now() - 60200)){
+      if (users[i].lastSessionEpochTime < (Date.now() - 604800)){
         users[i].activeWithinLastWeek = false
+      }else{
+        users[i].activeWithinLastWeek = true
       }
       users[i].save();
     }

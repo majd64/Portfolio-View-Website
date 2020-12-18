@@ -14,8 +14,8 @@ const report = new mongoose.Schema({
     numberOfNewProUsersToday: Number,
     averageSessionsPerUser: Number,
     averageSessionsPerActiveUser: Number, //active within last week
-    activeUsersWithinLastWeek: Boolean,
-    activeUsersWithinLastDay: Boolean
+    activeUsersWithinLastWeek: Number,
+    activeUsersWithinLastDay: Number
   }]}
 })
 
