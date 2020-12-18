@@ -141,7 +141,7 @@ async function newDay(){
 
 checkActiveUsers()
 async function checkActiveUsers(){
-  await Device.find(({$or: [{activeWithinLastDay: true, activeWithinLastWeek: true}]}), async (err, users) => {
+  await Device.find(({$or: [{}]}), async (err, users) => {
     for (var i = 0; i < users.length; i ++){
       if (users[i].lastSessionEpochTime > (Date.now() - 86400)){
         users[i].activeWithinLastDay = false
