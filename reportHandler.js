@@ -143,7 +143,6 @@ async function generateReport(callback){
     }, 1);
 }
 
-sendReportByEmail();
 function sendReportByEmail(){
   generateReport(dailyReport => {
     var mailOptions = {
