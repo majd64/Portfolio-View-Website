@@ -11,13 +11,6 @@ var transporter = nodemailer.createTransport({
 });
 
 router.get("/", (req, res) => {
-  var mailOptions = {
-    from: process.env.NODEMAILERUSER,
-    to: process.env.EMAIL,
-    subject: "Portfolio View Visitor",
-    text: `Date: ${new Date()}`
-  };
-  transporter.sendMail(mailOptions);
   res.render("home")
 });
 

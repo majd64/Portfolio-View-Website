@@ -1,11 +1,10 @@
 let Device = require("./models/device");
-let Report = require("./models/report");
+let Log = require("./models/report");
+
 const nodemailer = require("nodemailer");
 const express = require("express");
 var router = express.Router();
 var moment = require("moment");
-
-const myDeviceIds = ["9tXPNP4Tm3mAaUQLBpXXKo30", "4jXz54YIoviZ93GPcDfJHLq4"]
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -15,141 +14,157 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-var totalNumberOfSessionsYesterday = 1221;
-var totalNumberOfUsersYesterday = 69;
-var totalNumberOfProUsersYesterday = 1;
-
-function createReport(){
-  var newReport = new Report({
-    reportNumber: 1,
-    portfolioViewVersion: 2,
-    dateCreated: "Dec 11, 2020",
-    reports: []
-  })
-  newReport.save();
+async function handleReports() {
+  (async function loop() {
+      var now = new Date();
+      if (now.getHours() === 1 && now.getMinutes() === 0) {
+        await checkActiveUsers()
+        updateLog(false)
+        sendReportByEmail()
+      }
+      now = new Date();                  // allow for time passing
+      setTimeout(loop, 45000);
+  })();
 }
 
-// createReport()
+function createLog(){
+  const log = new Log({
+    logNumber: 1,
+    dayCount: 0,
+  });
+  log.save();
+}
 
-function handleReports() {
-    (function loop() {
-        var now = new Date();
-        if (now.getHours() === 1 && now.getMinutes() === 0) {
-            newDay();
-        }
-        now = new Date();                  // allow for time passing
-        setTimeout(loop, 45000);
-    })();
+// createLog();
+
+function updateLog(init){
+  generateReport(report => {
+    Log.findOne({logNumber: 1}, (err, log) => {
+      const sessions = report.totalSessions
+      const users = report.totalUsers
+      const proUsers = report.totalPro
+      const dayCount = log.dayCount
+      if (!init){
+        log.dayCount += 1
+      }
+      log.sessionsYesterday = sessions
+      log.usersYesterday = users
+      log.proUsersYesterday = proUsers
+      if (dayCount % 7 === 0 || init){
+        log.sessionsLastWeek = sessions
+        log.usersLastWeek = users
+        log.proUsersLastWeek = proUsers
+      }
+      if (dayCount % 30 === 0 || init){
+        log.sessionsLastMonth = sessions
+        log.usersLastMonth = users
+        log.proUsersLastMonth = proUsers
+      }
+      log.save();
+    })
+  })
 }
 
 async function generateReport(callback){
-  try{
-    Report.findOne({reportNumber: 1}, async (err, report) => {
-      if (err || !report){
-        console.log(err)
-        return
-      }
-      var date = new Date();
+    var date = new Date();
+    var users = 0
+    var proUsers = 0
+    var sessions = 0
+    var activeDaily = 0
+    var activeWeekly = 0
 
-      var totalNumberOfUsers = 0
-      var totalNumberOfProUsers = 0
-      var totalNumberOfSessions = 0
-      var totalNumberOfUsersActiveWithinLastDay = 0
-      var totalNumberOfUsersActiveWithinLastWeek = 0
+    var usersYesterday = 0
+    var proUsersYesterday = 0
+    var sessionsYesterday = 0
+    var usersLastWeek = 0
+    var proUsersLastWeek = 0
+    var sessionsLastWeek = 0
+    var usersLastMonth = 0
+    var proUsersLastMonth = 0
+    var sessionsLastMonth = 0
 
-      await Device.countDocuments({}, async (err, users) => {
-          totalNumberOfUsers = users
-      })
-      await Device.countDocuments({premium: true}, async (err, proUsers) => {
-         totalNumberOfProUsers = proUsers
-      })
-      await Device.aggregate(
-        [
-          {$match: {}},
-          {$group: {_id: null, total: {$sum: "$sessionCount"}}}
-        ], ((err, results) => {
-          console.log(results)
-           totalNumberOfSessions = results[0].total
-        })
-      )
-      await Device.find({deviceId: { $in: myDeviceIds}}, async (err, myDevices) => {
-        myDevices.forEach((item, i) => {
-          totalNumberOfSessions -= item.sessionCount
-        });
-      })
-      await Device.countDocuments({activeWithinLastWeek: true}, async (err, users) => {
-        totalNumberOfUsersActiveWithinLastWeek = users
-      })
-      await Device.countDocuments({activeWithinLastDay: true}, async (err, users) => {
-        totalNumberOfUsersActiveWithinLastDay = users
-      })
-
-      totalNumberOfUsers -= myDeviceIds.length
-      totalNumberOfProUsers -= myDeviceIds.length
-
-      const dailyReport = {
-        date: date.toString(),
-        totalNumberOfUsers: totalNumberOfUsers,
-        numberOfNewUsersToday: (totalNumberOfUsers - totalNumberOfUsersYesterday),
-        totalNumberOfSessions: (totalNumberOfSessions),
-        numberOfNewSessionsToday: (totalNumberOfSessions - totalNumberOfSessionsYesterday),
-        totalNumberOfProUsers: totalNumberOfProUsers,
-        numberOfNewProUsersToday: (totalNumberOfProUsers - totalNumberOfProUsersYesterday),
-        averageSessionsPerUser:  (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsers,
-        averageSessionsPerActiveUser: (totalNumberOfSessions - totalNumberOfSessionsYesterday) / totalNumberOfUsersActiveWithinLastWeek,
-        activeUsersWithinLastDay: totalNumberOfUsersActiveWithinLastDay,
-        activeUsersWithinLastWeek: totalNumberOfUsersActiveWithinLastWeek
-      }
-      callback(dailyReport)
+    await Device.countDocuments({}, async (err, userCount) => {
+        users = userCount
     })
-  }catch(err){
-    console.log(err)
-  }
+    await Device.countDocuments({premium: true}, async (err, users) => {
+       proUsers = users
+    })
+    await Device.aggregate(
+      [
+        {$match: {}},
+        {$group: {_id: null, total: {$sum: "$sessionCount"}}}
+      ], ((err, results) => {
+         sessions = results[0].total
+      })
+    )
+    await Device.countDocuments({activeWithinLastWeek: true}, async (err, users) => {
+      activeWeekly = users
+    })
+    await Device.countDocuments({activeWithinLastDay: true}, async (err, users) => {
+      activeDaily = users
+    })
+
+    await Log.findOne({logNumber: 1}, async (err, log) => {
+      usersYesterday = log.usersYesterday,
+      proUsersYesterday = log.proUsersYesterday,
+      sessionsYesterday = log.sessionsYesterday,
+      usersLastWeek = log.usersLastWeek,
+      proUsersLastWeek = log.proUsersLastWeek,
+      sessionsLastWeek = log.sessionsLastWeek,
+      usersLastMonth = log.usersLastMonth,
+      proUsersLastMonth = log.proUsersLastMonth,
+      sessionsLastMonth = log.sessionsLastMonth
+    })
+
+    setTimeout(() => {
+      const report = {
+        date: date.toString(),
+
+        totalUsers: users,
+        newDailyUsers: (users - usersYesterday),
+        newWeeklyUsers: (users - usersLastWeek),
+        newMonthlyUsers: (users - usersLastMonth),
+
+        totalSessions: (sessions),
+        newDailySessions: (sessions - sessionsYesterday),
+        newWeeklySessions: (sessions - sessionsLastWeek),
+        newMonthlySessions: (sessions - sessionsLastMonth),
+
+        totalPro: proUsers,
+        newDailyPro: (proUsers - proUsersYesterday),
+        newWeeklyPro: (proUsers - proUsersLastWeek),
+        newMonthlyPro: (proUsers - proUsersLastMonth),
+
+        avgDailySessions: (sessions - sessionsYesterday) / activeWeekly,
+        dailyActive: activeDaily,
+        weeklyActive: activeWeekly
+      }
+      callback(report)
+    }, 1);
 }
 
-async function newDay(){
-  await checkActiveUsers()
+sendReportByEmail();
+function sendReportByEmail(){
   generateReport(dailyReport => {
-    totalNumberOfSessionsYesterday = dailyReport.totalNumberOfSessions
-    totalNumberOfUsersYesterday = dailyReport.totalNumberOfUsers
-    totalNumberOfProUsersYesterday = dailyReport.totalNumberOfProUsers
     var mailOptions = {
       from: process.env.NODEMAILERUSER,
       to: process.env.EMAIL,
       subject: `Portfolio View Daily Report Ready ${dailyReport.date}`,
-      text: `
-      Total users: ${dailyReport.totalNumberOfUsers}
-      New users: ${dailyReport.numberOfNewUsersToday}
-
-      Total sessions: ${dailyReport.totalNumberOfSessions}
-      New sessions: ${dailyReport.numberOfNewSessionsToday}
-      Average sessions per active user: ${dailyReport.averageSessionsPerActiveUser}
-      Average sessions per user: ${dailyReport.averageSessionsPerUser}
-
-      Total pro users: ${dailyReport.totalNumberOfProUsers}
-      Todays new pro users: ${dailyReport.numberOfNewProUsersToday}
-
-      Active users within last week: ${dailyReport.activeUsersWithinLastWeek}
-      Active users within last day: ${dailyReport.activeUsersWithinLastDay}
-      `
+      text: JSON.stringify(dailyReport)
     };
     transporter.sendMail(mailOptions);
-    report.reports.push(dailyReport)
-    report.save();
   });
 }
 
-checkActiveUsers()
 async function checkActiveUsers(){
-  await Device.find(({$or: [{}]}), async (err, users) => {
+  await Device.find({}, async (err, users) => {
     for (var i = 0; i < users.length; i ++){
-      console.log(`now: ${Date.now()} id: ${users[i].deviceId} Last epoch: ${users[i].lastSessionEpochTime}`)
-      if (users[i].lastSessionEpochTime < (Date.now() - 86400)){
+      if (users[i].lastSessionEpochTime < (Date.now() - 86400000)){
         users[i].activeWithinLastDay = false
-       }else{
+      }else{
         users[i].activeWithinLastDay = true
       }
-      if (users[i].lastSessionEpochTime < (Date.now() - 604800)){
+      if (users[i].lastSessionEpochTime < (Date.now() - 604800000)){
         users[i].activeWithinLastWeek = false
       }else{
         users[i].activeWithinLastWeek = true
@@ -160,28 +175,8 @@ async function checkActiveUsers(){
 }
 
 router.get("/", async (req, res) => {
-  generateReport(report => {
-    let rep = {
-      users: {
-        totalUsers: report.totalNumberOfUsers,
-        newUsers: report.numberOfNewUsersToday,
-      },
-      proUsers: {
-        totalProUsers: report.totalNumberOfProUsers,
-        newProUsers: report.numberOfNewProUsersToday
-      },
-      activeUsers: {
-        weekly: report.activeUsersWithinLastWeek,
-        daily: report.activeUsersWithinLastDay
-      },
-      sessions: {
-        totalSessions: report.totalNumberOfSessions,
-        newSessions: report.numberOfNewSessionsToday,
-        avgSessionsPerActiveUser: report.averageSessionsPerActiveUser.toFixed(2),
-        avgSessions: report.averageSessionsPerUser.toFixed(2)
-      }
-    }
-    res.send(JSON.stringify(rep))
+  generateReport(r => {
+    res.send(JSON.stringify(r))
   });
 
 })

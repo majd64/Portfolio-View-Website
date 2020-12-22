@@ -1,24 +1,19 @@
 const mongoose = require('mongoose');
 
-const report = new mongoose.Schema({
-  reportNumber: Number,
-  portfolioViewVersion: Number,
-  dateCreated: String,
-  reports: {type: [{
-    date: String,
-    totalNumberOfUsers: Number,
-    numberOfNewUsersToday: Number,
-    totalNumberOfSessions: Number,
-    numberOfNewSessionsToday: Number,
-    totalNumberOfProUsers: Number,
-    numberOfNewProUsersToday: Number,
-    averageSessionsPerUser: Number,
-    averageSessionsPerActiveUser: Number, //active within last week
-    activeUsersWithinLastWeek: Number,
-    activeUsersWithinLastDay: Number
-  }]}
+const log = new mongoose.Schema({
+  logNumber: Number,
+  dayCount: Number,
+  sessionsYesterday: Number,
+  usersYesterday: Number,
+  proUsersYesterday: Number,
+  sessionsLastWeek: Number,
+  usersLastWeek: Number,
+  proUsersLastWeek: Number,
+  sessionsLastMonth: Number,
+  usersLastMonth: Number,
+  proUsersLastMonth: Number
 })
 
-const Report = mongoose.model("Report", report);
+const Log = mongoose.model("Log", log);
 
-module.exports = Report;
+module.exports = Log;

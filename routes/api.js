@@ -12,7 +12,6 @@ var transporter = nodemailer.createTransport({
 });
 
 router.post("/registerdevice", (req, res) => {
-  console.log("regsiter device")
   Device.findOne({deviceId: req.body.deviceId}, (err, device) => {
     if (err){
       res.sendStatus(500);
@@ -37,7 +36,6 @@ router.post("/registerdevice", (req, res) => {
 });
 
 router.post("/alerts/:deviceId", (req, res) => {
-  console.log("new alerts")
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -56,7 +54,6 @@ router.post("/alerts/:deviceId", (req, res) => {
 })
 
 router.get("/alerts/:deviceId", (req, res) =>{
-  console.log("get alerts")
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       console.log("device " + device)
@@ -69,7 +66,6 @@ router.get("/alerts/:deviceId", (req, res) =>{
 });
 
 router.post("/alerts/delete/:deviceId", (req, res) =>{
-  console.log("delete alert")
   Device
   .updateMany(
     {deviceId: req.params.deviceId},
@@ -85,7 +81,6 @@ router.post("/alerts/delete/:deviceId", (req, res) =>{
 })
 
 router.post("/session/:deviceId", (req, res) => {
-  console.log("session")
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -94,7 +89,6 @@ router.post("/session/:deviceId", (req, res) => {
     device.sessionCount += 1;
     try{
       device.deviceToken = req.body.deviceToken
-      device.lastSession = req.body.lastSession
       device.premium = req.body.premium
       device.preferredCurrency = req.body.preferredCurrency
       device.lastSessionEpochTime = Date.now();
@@ -111,7 +105,6 @@ router.get("/promo", (req, res) => {
 })
 
 router.get("/premiumpurchased", (req, res) => {
-  console.log("remium")
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
@@ -121,6 +114,5 @@ router.get("/premiumpurchased", (req, res) => {
   transporter.sendMail(mailOptions);
   res.sendStatus(200);//
 })
-
 
 module.exports = router;
