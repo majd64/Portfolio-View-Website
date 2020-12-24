@@ -23,7 +23,7 @@ async function handleReports() {
         sendReportByEmail()
       }
       now = new Date();                  // allow for time passing
-      setTimeout(loop, 45000);
+      setTimeout(loop, 55000);
   })();
 }
 

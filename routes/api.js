@@ -101,7 +101,7 @@ router.post("/session/:deviceId", (req, res) => {
 });
 
 router.get("/promo", (req, res) => {
-  res.status(200).send({title: "0.01 BTC Giveaway", url: ""})
+  res.status(200).send({title: "", url: "", showDeviceId: false})
 })
 
 router.get("/premiumpurchased", (req, res) => {
