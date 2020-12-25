@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const nodemailer = require("nodemailer");
+let Email = require("../models/email");
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -73,5 +74,37 @@ router.post("/email", (req, res) => {
     message: "We will notify you!"
   });
 });
+
+router.get("/download/:id?", (req, res) => {
+  var id = req.params.id
+  if (id){
+    Email.findOne({id: req.params.id}, (err, email) => {
+      if (!err && email){
+        email.didClickDownload = true
+        email.save()
+      }
+    })
+  }
+  res.redirect("https://apps.apple.com/app/portfolio-view-crypto-tracker/id1540033839#?platform=iphone")
+})
+
+router.get("/unsubscribe/:id?", (req, res) => {
+  var id = req.params.id
+  if (id){
+    Email.findOne({id: req.params.id}, (err, email) => {
+      if (!err && email){
+        email.unsubscribed = true
+        email.save()
+      }
+    })
+  }
+  res.redirect("/unsubscribed")
+})
+
+router.get("/unsubscribed", (req, res) => {
+  res.render("success", {
+    message: "You will not receieve any more emails from us!"
+  });
+})
 
 module.exports = router;
