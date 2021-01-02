@@ -1,0 +1,44 @@
+<%- include("header") -%>
+<div class="feedback">
+  <div class="container contact-box">
+    <h1 class="contact-header">Feedback</h1>
+    <p class="contact-top-text">
+      Thank you very much for your feedback! If you provide your email (optional) you will be entered into a $50 crypto giveaway for the crypto of your choice. The giveaway closes on January 15. All the fields are optional
+    </p>
+    <form action="/feedback" method="post">
+      <div class="form-group">
+        <label for="formControlRange">Overall how satisfied are you with Portfolio View</label>
+        <input type="range" class="form-control-range" id="formControlRange" name="range">
+      </div>
+      <div class="form-group">
+        <label for="body-text-area">Why did you choose Portfolio View over other crypto trackers? </label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="why"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="body-text-area">What is your favourite thing about Portfolio View</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="favourite"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="body-text-area">What is your least favourite thing about Portfolio View</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="leastFavourite"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="body-text-area">What feature(s) do you want to see in Portfolio View</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="features"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="body-text-area">Anything else you want to let us know</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="other"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="body-text-area">Email (Completley optional. Only used to enter you into the giveaway and contact you if you win)</label>
+        <textarea class="form-control rounded-0" id="body-text-area" rows="1" name="email"></textarea>
+      </div>
+      <p>Thank you very much for your feedback! My goal is to give you the best experiance possible and to build the best crypto tracker on the market! Also, please consider leaving a <a href="https://apps.apple.com/app/id1540033839?action=write-review"> review on the app store.</a> A review helps me a whole lot!</p>
+      <button class="btn btn-outline btn-xl" type="submit">Send</button>
+    </form>
+    <br style="height: 1000px">
+  </div>
+</div>
+<%- include("footer") -%>

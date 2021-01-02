@@ -10,18 +10,19 @@ mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.
   useUnifiedTopology: true
 });
 
-// const readInterface = readline.createInterface({
-//     input: fs.createReadStream('emailBatches/batch1.txt'),
-//     output: process.stdout,
-//     console: false
-// });
-//
-// readInterface.on('line', function(address) {
-//   const id = uuidv1();
-//   const email = new Email({
-//     emailAddress: address,
-//     id: id,
-//     batchId: 1
-//   })
-//   email.save();
-// });//
+
+const readInterface = readline.createInterface({
+    input: fs.createReadStream('./emailBatches/batch4.txt'),
+    output: process.stdout,
+    console: false
+});
+
+readInterface.on('line', function(address) {
+  const id = uuidv1();
+  const email = new Email({
+    emailAddress: address,
+    id: id,
+    batchId: 3
+  })
+  email.save();
+});//

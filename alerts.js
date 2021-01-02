@@ -48,7 +48,7 @@ function handleAlerts(){
 
 function getPrices(callback){
   const data = []
-  axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=160&page=1&sparkline=false')
+  axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false')
   .then(response => {
     for (i = 0; i < response.data.length; i++){
       data.push({id: response.data[i].id, price: response.data[i].current_price, symbol: response.data[i].symbol.toUpperCase()})
@@ -88,5 +88,12 @@ function formatMoney(value){
   })
   return formatter.format(value)
 }
+
+// Device.find({}, (err, devices) => {
+//   devices.forEach((device, i) => {
+//     sendNotification(device.deviceToken, "I wish you a happy new years and continued crypto gains throughout all of 2021. Best, Portfolio View dev.")
+//   });
+// })
+
 
 module.exports = handleAlerts

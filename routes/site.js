@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 const nodemailer = require("nodemailer");
 let Email = require("../models/email");
+let Feedback = require("../models/feedback");
+
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -43,6 +45,26 @@ router.get("/support", (req, res) => {
     text: "I will do my best to respond as fast as possible."
   });
 });
+
+router.get("/feedback", (req, res) =>{
+  res.render("feedback")
+})
+
+router.post("/feedback", (req, res) => {
+  console.log(req.body)
+  feedback = new Feedback(req.body)
+  feedback.save()
+  var mailOptions = {
+    from: process.env.NODEMAILERUSER,
+    to: process.env.EMAIL,
+    subject: "*Portfolio View Feeback*",
+    text: JSON.stringify(req.body)
+  };
+  transporter.sendMail(mailOptions);
+  res.render("success", {
+    message: "Thank you for your feedback"
+  });
+})
 
 router.post("/support", (req, res) => {
   var mailOptions = {

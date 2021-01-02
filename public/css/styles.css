@@ -4,6 +4,11 @@ html, body {
   margin: 0;
 }
 
+.feedback p{
+  font-size: 0.8rem;
+}
+
+
 .wrapper{
   min-height: 100%;
 
@@ -46,11 +51,12 @@ header.masthead {
   bottom: 50px;
 }
 
-.contact, .success, .coming-soon{
+.contact, .success, .coming-soon, .feedback{
   background: linear-gradient(#5680E9, #8860D0);
-  height: 100vh;
+  min-height: 100vh;
   color: white;
   padding-top: 20px;
+  background-color: #8860D0
 }
 
 .no-spam{
@@ -94,10 +100,6 @@ header.masthead .device-container {
   header.masthead .device-container {
     max-width: 425px;
   }
-
-
-
-
 }
 
 section.download {
@@ -135,10 +137,14 @@ section.download .section-heading {
   section.download h2 {
     font-size: 70px;
   }
-
-
 }
 
+@media only screen and (max-width: 600px) {
+  .footer{
+    display: none;
+  }
+
+}
 
 .btn-outline {
   color: white;
