@@ -129,4 +129,10 @@ router.get("/unsubscribed", (req, res) => {
   });
 })
 
+router.get("/issue", (req, res) => {
+  res.render("success", {
+    message: "Currently one of the API's used by Portfolio View is having issues which is why the secondary currency is not working. I am working to fix this. I do apologize for the inconveinace and promise it will be fixed soon!"
+  })
+})
+
 module.exports = router;

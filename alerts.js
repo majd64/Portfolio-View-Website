@@ -88,12 +88,13 @@ function formatMoney(value){
   })
   return formatter.format(value)
 }
-
+//
 // Device.find({}, (err, devices) => {
 //   devices.forEach((device, i) => {
-//     sendNotification(device.deviceToken, "I wish you a happy new years and continued crypto gains throughout all of 2021. Best, Portfolio View dev.")
+//     sendNotification(device.deviceToken, "Currently the exchnage rate API used by Portfolio View is having issues which is causing the secondary currency to not work. I do apologise for this and am trying to contact the API service, hopefully it will be fixed soon. HODL on!")
 //   });
 // })
 
+// sendNotification("F80B35A2FBE59F88A1D50335A02FB8E03F6ED4D7DC38F448E9831FCF4DAAB427", "Hello, Portfolio view dev here")
 
 module.exports = handleAlerts

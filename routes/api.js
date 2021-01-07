@@ -101,7 +101,7 @@ router.post("/session/:deviceId", (req, res) => {
 });
 
 router.get("/promo", (req, res) => {
-  res.status(200).send({title: "Feedback for a chance to win $50", url: "https://www.portfolioview.ca/feedback", showDeviceId: false})
+  res.status(200).send({title: "We are working to fix the secondary currency, sorry for the inconvenience", url: "https://www.portfolioview.ca/issue", showDeviceId: false})
 })
 
 router.get("/premiumpurchased", (req, res) => {
