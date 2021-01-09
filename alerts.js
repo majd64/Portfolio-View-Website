@@ -23,7 +23,7 @@ function handleAlerts(){
         axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${alert.coinID}&vs_currencies=${alert.currencyID}`)
         .then(response => {
           const currentPrice = response.data[alert.coinID][alert.currencyID]
-          if (alert.above && currentPrice > alert.price){
+          if (alert.above && currentPrice >= alert.price){
             sendNotification(device.deviceToken, `${alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(j, 1);
             device.save();
