@@ -16,7 +16,7 @@ console.log(process.env.NODE_ENV)
 function handleAlerts(){
   Device.find({ alerts: { $exists: true, $ne: [] } }, (err, devices) => {
     devices.forEach((device, i) => {
-      device.alerts.forEach((alert, i) => {
+      device.alerts.forEach((alert, j) => {
         if (!alert.currencyID){
           alert.currencyID = "usd"
         }
@@ -25,12 +25,12 @@ function handleAlerts(){
           const currentPrice = response.data[alert.coinID][alert.currencyID]
           if (alert.above && currentPrice > alert.price){
             sendNotification(device.deviceToken, `${alert.coinID.toUpperCase()} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            device.alerts.splice(k, 1);
+            device.alerts.splice(j, 1);
             device.save();
           }
           if (!alert.above && alert.price > currentPrice){
             sendNotification(device.deviceToken, `${alert.coinID.toUpperCase()} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            device.alerts.splice(k, 1);
+            device.alerts.splice(j, 1);
             device.save();
           }
         })
