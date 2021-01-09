@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 var apiRoute = require("./routes/api");
 var siteRoute = require("./routes/site");
 var alerts = require("./alerts");
+
 var reportHandler = require("./reportHandler")
 
 mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.mongodb.net/" + process.env.DBUSER, {

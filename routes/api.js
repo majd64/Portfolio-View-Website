@@ -36,6 +36,7 @@ router.post("/registerdevice", (req, res) => {
 });
 
 router.post("/alerts/:deviceId", (req, res) => {
+  console.log(req.body)
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -44,6 +45,7 @@ router.post("/alerts/:deviceId", (req, res) => {
     device.alerts.push(
       {
         coinID: req.body.coinID,
+        currencyID: req.body.currencyID,
         price: req.body.price,
         above: req.body.above
       }
@@ -56,11 +58,11 @@ router.post("/alerts/:deviceId", (req, res) => {
 router.get("/alerts/:deviceId", (req, res) =>{
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
-      console.log("device " + device)
       console.log(err)
       res.sendStatus(500);
       return
     }
+    console.log(device.alerts)
     res.status(200).send({"alerts": device.alerts})
   });
 });
