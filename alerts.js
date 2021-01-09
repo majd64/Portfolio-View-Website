@@ -29,7 +29,7 @@ function handleAlerts(){
             device.save();
           }
           if (!alert.above && alert.price > currentPrice){
-            sendNotification(user.deviceToken, `${alert.coinID.toUpperCase()} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+            sendNotification(device.deviceToken, `${alert.coinID.toUpperCase()} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(k, 1);
             device.save();
           }
