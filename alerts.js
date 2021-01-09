@@ -24,12 +24,12 @@ function handleAlerts(){
         .then(response => {
           const currentPrice = response.data[alert.coinID][alert.currencyID]
           if (alert.above && currentPrice > alert.price){
-            sendNotification(device.deviceToken, `${alert.coinID.toUpperCase()} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+            sendNotification(device.deviceToken, `${alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(j, 1);
             device.save();
           }
           if (!alert.above && alert.price > currentPrice){
-            sendNotification(device.deviceToken, `${alert.coinID.toUpperCase()} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+            sendNotification(device.deviceToken, `${alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(j, 1);
             device.save();
           }
