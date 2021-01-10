@@ -42,12 +42,17 @@ router.post("/alerts/:deviceId", (req, res) => {
       res.sendStatus(500);
       return
     }
+    let ticker = ""
+    if (req.body.coinTicker) {
+      ticker = req.body.coinTicker
+    }
     device.alerts.push(
       {
         coinID: req.body.coinID,
         currencyID: req.body.currencyID,
         price: req.body.price,
-        above: req.body.above
+        above: req.body.above,
+        ticker: ticker
       }
     )
     device.save();
@@ -67,7 +72,7 @@ router.get("/alerts/:deviceId", (req, res) =>{
   });
 });
 
-router.post("/alerts/delete/:deviceId", (req, res) =>{
+router.post("/alerts/delete/:deviceId", (req, res) => {
   Device
   .updateMany(
     {deviceId: req.params.deviceId},
