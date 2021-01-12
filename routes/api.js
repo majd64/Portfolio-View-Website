@@ -52,7 +52,7 @@ router.post("/alerts/:deviceId", (req, res) => {
         currencyID: req.body.currencyID,
         price: req.body.price,
         above: req.body.above,
-        ticker: ticker
+        coinTicker: ticker
       }
     )
     device.save();
@@ -67,7 +67,6 @@ router.get("/alerts/:deviceId", (req, res) =>{
       res.sendStatus(500);
       return
     }
-    console.log(device.alerts)
     res.status(200).send({"alerts": device.alerts})
   });
 });
@@ -107,15 +106,34 @@ router.post("/session/:deviceId", (req, res) => {
   });
 });
 
+var codes = ["cheesecake"]
+router.get("/redeemcode/:code", (req, res) => {
+  if (req.params.code){
+
+    if (codes.includes(req.params.code)){
+
+      const index = codes.indexOf(req.params.code);
+      codes.splice(index, 1);
+      console.log(codes)
+
+      res.status(200).send({res: "success"})
+    }else{
+      res.status(200).send({res: "failure"})
+    }
+    return
+  }
+  res.status(400).send({res: "failure"})
+})
+
 router.get("/promo", (req, res) => {
   res.status(200).send({title: "Feedback for a chance to win $50", url: "https://www.portfolioview.ca/feedback", showDeviceId: false})
 })
 
-router.get("/premiumpurchased", (req, res) => {
+router.get("/premiumpurchased/:type", (req, res) => {
   var mailOptions = {
     from: process.env.NODEMAILERUSER,
     to: process.env.EMAIL,
-    subject: "Portfolio View Premium Purchased!",///
+    subject: `Portfolio View Premium Purchased! Method: ${req.params.type ? req.params.type : ""}`,///
     text: `${new Date()}`
   };
   transporter.sendMail(mailOptions);
