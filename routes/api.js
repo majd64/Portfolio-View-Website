@@ -106,7 +106,7 @@ router.post("/session/:deviceId", (req, res) => {
   });
 });
 
-var codes = ["cheese1, cheese2, cheese3, cheese4, cheese5, cheese6, cheese7, cheese8, cheese9, cheese10"]
+var codes = ["cheese1", "cheese2", "cheese3", "cheese4", "cheese5", "cheese6", "cheese7", "cheese8", "cheese9", "cheese10", "cheese0"]
 router.get("/redeemcode/:code", (req, res) => {
   if (req.params.code){
 
