@@ -106,14 +106,14 @@ router.post("/session/:deviceId", (req, res) => {
   });
 });
 
-var codes = ["cheesecake"]
+var codes = ["cheese1, cheese2, cheese3, cheese4, cheese5, cheese6, cheese7, cheese8, cheese9, cheese10"]
 router.get("/redeemcode/:code", (req, res) => {
   if (req.params.code){
 
     if (codes.includes(req.params.code)){
 
       const index = codes.indexOf(req.params.code);
-      // codes.splice(index, 1);
+      codes.splice(index, 1);
       console.log(codes)
 
       res.status(200).send({res: "success"})
