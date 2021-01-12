@@ -113,7 +113,7 @@ router.get("/redeemcode/:code", (req, res) => {
     if (codes.includes(req.params.code)){
 
       const index = codes.indexOf(req.params.code);
-      codes.splice(index, 1);
+      // codes.splice(index, 1);
       console.log(codes)
 
       res.status(200).send({res: "success"})
