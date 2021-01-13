@@ -49,12 +49,14 @@ handleVolatilityAlerts()
 function handleVolatilityAlerts(){
   axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
   .then(response => {
+
     //3600000
     let change = response.data[0].price_change_percentage_1h_in_currency
     let priceUsd = formatMoney(response.data[0].current_price, "USD")
-    if (Math.abs(change) >= 1){//
+
+    if (Math.abs(change) >= 3){//
       if (lastTime3PercentUsersWereAlerted < Date.now() - 3600000){
-        Device.find({volatilityAlerts: 3}, (err, devices) => {
+        Device.find({volatilityAlerts: 1}, (err, devices) => {
           devices.forEach((device, i) => {
             sendNotification(device.deviceToken, `BTC is ${change > 0 ? "up" : "down"} ${`${change.toFixed(2)}% in the last hour`}\nPrice is ${priceUsd} USD`)
           });
