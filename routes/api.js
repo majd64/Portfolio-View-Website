@@ -86,13 +86,31 @@ router.post("/alerts/delete/:deviceId", (req, res) => {
   });
 })
 
+router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
+  Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
+    if (err || !device || !(0 <= Number(req.params.value) <= 2)){
+      console.log("err")
+      res.sendStatus(400)
+      return
+    }
+    let val = Number(req.params.value)
+    device.volatilityAlerts = val
+    device.save()
+    res.sendStatus(200)
+  })
+})
+
 router.post("/session/:deviceId", (req, res) => {
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
       return
     }
+
     device.sessionCount += 1;
+    if (req.body.volatilityAlerts && Number(req.body.volatilityAlerts)){
+      device.volatilityAlerts = Number(req.body.volatilityAlerts)
+    }
     try{
       device.deviceToken = req.body.deviceToken
       device.premium = req.body.premium

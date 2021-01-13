@@ -4,6 +4,7 @@ const device = new mongoose.Schema({
   deviceId: String,
   deviceToken: {type: String, default: ""},
   alerts: {type: [{coinID: String, coinTicker: String, currencyID: String, price: Number, above: Boolean}], default: []},
+  volatilityAlerts: {type: Number, default: 0}, //0 - off, 1 - 3%, 2 - 5% (only BTC for now)
   sessionCount: {type: Number, default: 0},
   premium: {type: Boolean, default: false},
   preferredCurrency: {type: String, default: ""},

@@ -43,6 +43,39 @@ function handleAlerts(){
   setTimeout(handleAlerts, 20000);
 }
 
+var lastTime3PercentUsersWereAlerted = 0
+var lastTime5PercentUsersWereAlerted = 0
+handleVolatilityAlerts()
+function handleVolatilityAlerts(){
+  axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
+  .then(response => {
+    //3600000
+    let change = response.data[0].price_change_percentage_1h_in_currency
+    let priceUsd = formatMoney(response.data[0].current_price, "USD")
+    if (Math.abs(change) >= 1){//
+      if (lastTime3PercentUsersWereAlerted < Date.now() - 3600000){
+        Device.find({volatilityAlerts: 3}, (err, devices) => {
+          devices.forEach((device, i) => {
+            sendNotification(device.deviceToken, `BTC is ${change > 0 ? "up" : "down"} ${`${change.toFixed(2)}% in the last hour`}\nPrice is ${priceUsd} USD`)
+          });
+        })
+        lastTime3PercentUsersWereAlerted = Date.now()
+      }
+      if (Math.abs(response.data[0].price_change_percentage_1h_in_currency) >= 5){
+        if (lastTime5PercentUsersWereAlerted < Date.now() - 3600000){
+          Device.find({volatilityAlerts: 2}, (err, devices) => {
+            devices.forEach((device, i) => {
+              sendNotification(device.deviceToken, `BTC is ${change > 0 ? "up" : "down"} ${`${change.toFixed(2)}% in the last hour`}\nPrice is ${priceUsd} USD`)
+            });
+          })
+          lastTime5PercentUsersWereAlerted = Date.now()
+        }
+      }
+    }
+  })
+  setTimeout(handleVolatilityAlerts, 20000);
+}
+
 function sendNotification(deviceToken, alert){
   console.log(`sending ${deviceToken}`)
   let notification = new apn.Notification();
