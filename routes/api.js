@@ -144,7 +144,7 @@ router.get("/redeemcode/:code", (req, res) => {
 })
 
 router.get("/promo", (req, res) => {
-  res.status(200).send({title: "Feedback for a chance to win $50", url: "https://www.portfolioview.ca/feedback", showDeviceId: false})
+  res.status(200).send({title: "What's new in V4 (coming out tomorrow)", url: "https://www.portfolioview.ca/new", showDeviceId: false})
 })
 
 router.get("/premiumpurchased/:type", (req, res) => {
