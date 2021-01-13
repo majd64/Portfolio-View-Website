@@ -51,7 +51,7 @@ header.masthead {
   bottom: 50px;
 }
 
-.contact, .success, .coming-soon, .feedback{
+.contact, .success, .coming-soon, .feedback, .new{
   background: linear-gradient(#5680E9, #8860D0);
   min-height: 100vh;
   color: white;

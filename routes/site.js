@@ -50,6 +50,10 @@ router.get("/feedback", (req, res) =>{
   res.render("feedback")
 })
 
+router.get("/new", (req, res) => {
+  res.render("whats-new")
+})
+
 router.post("/feedback", (req, res) => {
   console.log(req.body)
   feedback = new Feedback(req.body)
