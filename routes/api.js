@@ -67,6 +67,17 @@ router.get("/alerts/:deviceId", (req, res) =>{
       res.sendStatus(500);
       return
     }
+    device.alerts.forEach((alert, i) => {
+      if (!alert.currencyID){
+        device.alerts[i].currencyID = "USD"
+      }
+      if (!alert.coinTicker){
+        device.alerts[i].coinTicker = ""
+      }
+
+    });
+    device.save();
+
     res.status(200).send({"alerts": device.alerts})
   });
 });
