@@ -36,7 +36,6 @@ router.post("/registerdevice", (req, res) => {
 });
 
 router.post("/alerts/:deviceId", (req, res) => {
-  console.log(req.body)
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
       res.sendStatus(500);
@@ -63,7 +62,6 @@ router.post("/alerts/:deviceId", (req, res) => {
 router.get("/alerts/:deviceId", (req, res) =>{
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device){
-      console.log(err)
       res.sendStatus(500);
       return
     }
@@ -100,7 +98,6 @@ router.post("/alerts/delete/:deviceId", (req, res) => {
 router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
     if (err || !device || !(0 <= Number(req.params.value) <= 2)){
-      console.log("err")
       res.sendStatus(400)
       return
     }
@@ -138,13 +135,9 @@ router.post("/session/:deviceId", (req, res) => {
 var codes = ["cheese1", "cheese2", "cheese3", "cheese4", "cheese5", "cheese6", "cheese7", "cheese8", "cheese9", "cheese10", "cheese0"]
 router.get("/redeemcode/:code", (req, res) => {
   if (req.params.code){
-
     if (codes.includes(req.params.code)){
-
       const index = codes.indexOf(req.params.code);
       codes.splice(index, 1);
-      console.log(codes)
-
       res.status(200).send({res: "success"})
     }else{
       res.status(200).send({res: "failure"})

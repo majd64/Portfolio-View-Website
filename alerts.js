@@ -13,6 +13,8 @@ let options = {
 let apnProvider = new apn.Provider(options);
 console.log(process.env.NODE_ENV)
 
+const myDeviceToken = "E45E44937441F0CA18194544C2E3C3E390BECA03D371A79967D42AEF3C6CA15F"
+
 function handleAlerts(){
   Device.find({ alerts: { $exists: true, $ne: [] } }, (err, devices) => {
     devices.forEach((device, i) => {
@@ -25,11 +27,13 @@ function handleAlerts(){
           const currentPrice = response.data[alert.coinID][alert.currencyID]
           if (alert.above && currentPrice >= alert.price){
             sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+            sendNotification(myDeviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(j, 1);
             device.save();
           }
           if (!alert.above && alert.price > currentPrice){
             sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+            sendNotification(myDeviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
             device.alerts.splice(j, 1);
             device.save();
           }
@@ -79,7 +83,6 @@ function handleVolatilityAlerts(){
 }
 
 function sendNotification(deviceToken, alert){
-  console.log(`sending ${deviceToken}`)
   let notification = new apn.Notification();
   notification.expiry = Math.floor(Date.now() / 1000) + 24 * 3600;
   notification.sound = "default";
