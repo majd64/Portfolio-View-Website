@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 let Device = require("../models/device");
 const nodemailer = require("nodemailer");
+var alerts = require("../alerts");
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -95,6 +96,10 @@ router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
     device.save()
     res.sendStatus(200)
   })
+})
+
+router.get("/alerts/demo/:deviceId", (req, res) =>{
+  alerts(req.params.deviceId, `BTC is up 3.12% in the last hour\nPrice is $33,210.12 USD`)
 })
 
 router.post("/session/:deviceId", (req, res) => {

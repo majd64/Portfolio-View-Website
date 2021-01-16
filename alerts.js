@@ -16,8 +16,9 @@ console.log(process.env.NODE_ENV)
 const myDeviceToken = "E45E44937441F0CA18194544C2E3C3E390BECA03D371A79967D42AEF3C6CA15F"
 
 let alertObj = {currencies: []}
+handleAlerts()
 function handleAlerts(){
-  console.log("Alert session")
+  console.log("alert session")
   alertObj = {currencies: []}
   Device.find({ alerts: { $exists: true, $ne: [] } }, (err, devices) => {
     devices.forEach((device, i) => {
@@ -45,7 +46,6 @@ function handleAlerts(){
             devices.forEach((device, i) => {
               device.alerts.forEach((alert, j) => {
                 let currentPrice = alertObj[alert.currencyID] ? alertObj[alert.currencyID].prices[alert.coinID] : null
-
                 if (currentPrice){
                   if (alert.above && currentPrice >= alert.price){
                     sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
@@ -141,4 +141,4 @@ function formatMoney(value, currency){
   return formatter.format(value)
 }
 
-module.exports = handleAlerts
+module.exports = sendNotification

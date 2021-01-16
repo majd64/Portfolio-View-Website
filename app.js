@@ -14,7 +14,6 @@ mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.
   useUnifiedTopology: true
 });
 
-alerts()
 reportHandler.handleReports();
 
 const app = express();
