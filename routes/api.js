@@ -99,7 +99,9 @@ router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
 })
 
 router.get("/alerts/demo/:deviceId", (req, res) =>{
-  alerts(req.params.deviceId, `BTC is up 3.12% in the last hour\nPrice is $33,210.12 USD`)
+  setTimeout(function () {
+    alerts(req.params.deviceId, `BTC is up 3.12% in the last hour\nPrice is $33,210.12 USD`)
+  }, 1000)
 })
 
 router.post("/session/:deviceId", (req, res) => {
