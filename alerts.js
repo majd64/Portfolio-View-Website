@@ -15,71 +15,102 @@ console.log(process.env.NODE_ENV)
 
 const myDeviceToken = "E45E44937441F0CA18194544C2E3C3E390BECA03D371A79967D42AEF3C6CA15F"
 
+let alertObj = {currencies: []}
 function handleAlerts(){
+  alertObj = {currencies: []}
   Device.find({ alerts: { $exists: true, $ne: [] } }, (err, devices) => {
     devices.forEach((device, i) => {
       device.alerts.forEach((alert, j) => {
-        if (!alert.currencyID){
-          alert.currencyID = "usd"
+        if (!alertObj[alert.currencyID]){
+          alertObj[alert.currencyID] = {coinIds: [], prices: {}, coinIdString: ""}
+          alertObj.currencies.push(alert.currencyID)
         }
-        axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${alert.coinID}&vs_currencies=${alert.currencyID}`)
-        .then(response => {
-          const currentPrice = response.data[alert.coinID][alert.currencyID]
-          if (alert.above && currentPrice >= alert.price){
-            sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            sendNotification(myDeviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            device.alerts.splice(j, 1);
-            device.save();
-          }
-          if (!alert.above && alert.price > currentPrice){
-            sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            sendNotification(myDeviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
-            device.alerts.splice(j, 1);
-            device.save();
-          }
-        })
-        .catch(error => {
-          console.log(error)
-        });
+        if (!alertObj[alert.currencyID].coinIds.includes(alert.coinID)){
+          alertObj[alert.currencyID].coinIds.push(alert.coinID)
+          alertObj[alert.currencyID].coinIdString += `${alert.coinID},`
+          alertObj[alert.currencyID].prices[alert.coinID] = null
+        }
       });
     });
-  })
-  setTimeout(handleAlerts, 20000);
+    var counter = 0
+    alertObj.currencies.forEach((currency, i) => {
+      axios.get(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&ids=${alertObj[currency].coinIdString}&order=market_cap_desc&per_page=100&page=1&sparkline=false`)
+        .then(response => {
+          response.data.forEach((coin, j) => {
+            alertObj[currency].prices[coin.id] = coin.current_price
+          });
+          counter ++
+          if (counter === alertObj.currencies.length){
+            devices.forEach((device, i) => {
+              device.alerts.forEach((alert, j) => {
+                let currentPrice = alertObj[alert.currencyID] ? alertObj[alert.currencyID].prices[alert.coinID] : null
+
+                if (currentPrice){
+                  if (alert.above && currentPrice >= alert.price){
+                    sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is above ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+                    device.alerts.splice(j, 1);
+                    device.save();
+                  }
+                  if (!alert.above && alert.price > currentPrice){
+                    sendNotification(device.deviceToken, `${alert.coinTicker && alert.coinTicker != "" ? alert.coinTicker.toUpperCase() : alert.coinID} is below ${formatMoney(alert.price, alert.currencyID.toUpperCase())}`)
+                    device.alerts.splice(j, 1);
+                    device.save();
+                  }
+                }
+              });
+            });
+          }
+        });
+    });
+  });
+  setTimeout(handleAlerts, 12000);
 }
 
-var lastTime3PercentUsersWereAlerted = 0
-var lastTime5PercentUsersWereAlerted = 0
-handleVolatilityAlerts()
-function handleVolatilityAlerts(){
-  axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
+var btc1hLastAlertTime = 0
+var eth1hLastAlertTime = 0
+var btc1dLastAlertTime = 0
+var eth1dLastAlertTime = 0
+handlerVolatilityAlerts()
+function handlerVolatilityAlerts(){
+  axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2C%20ethereum&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h")
   .then(response => {
+    let btc1hChange = response.data[0].price_change_percentage_1h_in_currency
+    let btc1dChange = response.data[0].rice_change_percentage_24h_in_currency
+    let btcPrice = formatMoney(response.data[0].current_price, "USD")
 
-    //3600000
-    let change = response.data[0].price_change_percentage_1h_in_currency
-    let priceUsd = formatMoney(response.data[0].current_price, "USD")
+    let eth1hChange = response.data[1].price_change_percentage_1h_in_currency
+    let eth1dChange = response.data[1].rice_change_percentage_24h_in_currency
+    let ethPrice = formatMoney(response.data[1].current_price, "USD")
 
-    if (Math.abs(change) >= 3){//
-      if (lastTime3PercentUsersWereAlerted < Date.now() - 3600000){
-        Device.find({volatilityAlerts: 1}, (err, devices) => {
-          devices.forEach((device, i) => {
-            sendNotification(device.deviceToken, `BTC is ${change > 0 ? "up" : "down"} ${`${change.toFixed(2)}% in the last hour`}\nPrice is ${priceUsd} USD`)
-          });
-        })
-        lastTime3PercentUsersWereAlerted = Date.now()
-      }
-      if (Math.abs(response.data[0].price_change_percentage_1h_in_currency) >= 5){
-        if (lastTime5PercentUsersWereAlerted < Date.now() - 3600000){
-          Device.find({volatilityAlerts: 2}, (err, devices) => {
-            devices.forEach((device, i) => {
-              sendNotification(device.deviceToken, `BTC is ${change > 0 ? "up" : "down"} ${`${change.toFixed(2)}% in the last hour`}\nPrice is ${priceUsd} USD`)
-            });
-          })
-          lastTime5PercentUsersWereAlerted = Date.now()
-        }
-      }
+    if (Math.abs(btc1hChange) >= 3 && btc1hLastAlertTime < Date.now() - 3600000){
+      alertUsersWithVolatilityAlertsEnabled(`BTC is ${btc1hChange > 0 ? "up" : "down"} ${`${btc1hChange.toFixed(2)}% in the last hour`}\nPrice is ${btcPrice} USD`)
+      btc1hLastAlertTime = Date.now()
+    }
+
+    if (Math.abs(eth1hChange) >= 3 && eth1hLastAlertTime < Date.now() - 3600000){
+      alertUsersWithVolatilityAlertsEnabled(`ETH is ${eth1hChange > 0 ? "up" : "down"} ${`${eth1hChange.toFixed(2)}% in the last hour`}\nPrice is ${ethPrice} USD`)
+      eth1hLastAlertTime = Date.now()
+    }
+
+    if (Math.abs(btc1dChange) >= 6 && btc1dLastAlertTime < Date.now() - 86400000){
+      alertUsersWithVolatilityAlertsEnabled(`BTC is ${btc1hChange > 0 ? "up" : "down"} ${`${btc1hChange.toFixed(2)}% today`}\nPrice is ${btcPrice} USD`)
+      btc1dLastAlertTime = Date.now()
+    }
+
+    if (Math.abs(eth1dChange) >= 6 && eth1dLastAlertTime < Date.now() - 86400000){
+      alertUsersWithVolatilityAlertsEnabled(`ETH is ${eth1hChange > 0 ? "up" : "down"} ${`${eth1hChange.toFixed(2)}% today`}\nPrice is ${ethPrice} USD`)
+      eth1dLastAlertTime = Date.now()
     }
   })
-  setTimeout(handleVolatilityAlerts, 20000);
+  setTimeout(handlerVolatilityAlerts, 12000);
+}
+
+function alertUsersWithVolatilityAlertsEnabled(string){
+  Device.find({ $or:[ {volatilityAlerts: 1}, {volatilityAlerts: 2} ]}, (err, devices) => {
+    devices.forEach((device, i) => {
+      sendNotification(device.deviceToken, string)
+    });
+  })
 }
 
 function sendNotification(deviceToken, alert){
