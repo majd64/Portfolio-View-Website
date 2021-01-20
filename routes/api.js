@@ -3,6 +3,7 @@ var router = express.Router();
 let Device = require("../models/device");
 const nodemailer = require("nodemailer");
 var alerts = require("../alerts");
+const axios = require('axios');
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -36,8 +37,8 @@ router.post("/registerdevice", (req, res) => {
   });
 });
 
-router.post("/alerts/:deviceId", (req, res) => {
-  Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
+router.post("/alerts/:deviceId", async (req, res) => {
+  Device.findOne({deviceId: req.params.deviceId}, async (err, device) => {
     if (err || !device){
       res.sendStatus(500);
       return
@@ -55,7 +56,7 @@ router.post("/alerts/:deviceId", (req, res) => {
         coinTicker: ticker
       }
     )
-    device.save();
+    await device.save();
     res.sendStatus(201);
   })
 })
@@ -70,7 +71,14 @@ router.get("/alerts/:deviceId", (req, res) =>{
   });
 });
 
-router.post("/alerts/delete/:deviceId", (req, res) => {
+router.post("/alerts/delete/:deviceId", async (req, res) => {
+  if (!req.body.alert_id){
+    Device.findOne({deviceId: req.params.deviceId}, async (err, device) => {
+      device.alerts = []
+      await device.save()
+      res.sendStatus(200)
+    })
+  }
   Device
   .updateMany(
     {deviceId: req.params.deviceId},
@@ -99,9 +107,12 @@ router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
 })
 
 router.get("/alerts/demo/:deviceId", (req, res) =>{
-  setTimeout(function () {
-    alerts(req.params.deviceId, `BTC is up 3.12% in the last hour\nPrice is $33,210.12 USD`)
-  }, 1000)
+  axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
+  .then(response => {
+    let btc1hChange = response.data[0].price_change_percentage_1h_in_currency
+    let btcPrice = formatMoney(response.data[0].current_price, "USD")
+    alerts(req.params.deviceId, `BTC is ${btc1hChange > 0 ? "up" : "down"} ${`${btc1hChange.toFixed(2)}% in the last hour`}\nPrice is ${btcPrice} USD`)
+  })
 })
 
 router.post("/session/:deviceId", (req, res) => {
@@ -144,7 +155,7 @@ router.get("/redeemcode/:code", (req, res) => {
 })
 
 router.get("/promo", (req, res) => {
-  res.status(200).send({title: "Feedback for a chance to win $50", url: "https://www.portfolioview.ca/feedback", showDeviceId: false})
+  res.status(200).send({title: "", url: "", showDeviceId: false})
 })
 
 router.get("/premiumpurchased/:type", (req, res) => {
@@ -157,5 +168,19 @@ router.get("/premiumpurchased/:type", (req, res) => {
   transporter.sendMail(mailOptions);
   res.sendStatus(200);//
 })
+
+function formatMoney(value, currency){
+  var minimumFractionDigits = 2
+  let decimalNumbers = value.toString().split(".")[1]
+  if (decimalNumbers){
+    minimumFractionDigits = decimalNumbers.length
+  }
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: minimumFractionDigits
+  })
+  return formatter.format(value)
+}
 
 module.exports = router;
