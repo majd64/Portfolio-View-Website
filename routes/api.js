@@ -106,14 +106,14 @@ router.get("/alerts/volatility/:deviceId/:value", (req, res) => {
   })
 })
 
-router.get("/alerts/demo/:deviceId", (req, res) =>{
-  axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
-  .then(response => {
-    let btc1hChange = response.data[0].price_change_percentage_1h_in_currency
-    let btcPrice = formatMoney(response.data[0].current_price, "USD")
-    alerts(req.params.deviceId, `BTC is ${btc1hChange > 0 ? "up" : "down"} ${`${btc1hChange.toFixed(2)}% in the last hour`}\nPrice is ${btcPrice} USD`)
-  })
-})
+// router.get("/alerts/demo/:deviceId", (req, res) =>{
+//   axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h")
+//   .then(response => {
+//     let btc1hChange = response.data[0].price_change_percentage_1h_in_currency
+//     let btcPrice = formatMoney(response.data[0].current_price, "USD")
+//     alerts(req.params.deviceId, `BTC is ${btc1hChange > 0 ? "up" : "down"} ${`${btc1hChange.toFixed(2)}% in the last hour`}\nPrice is ${btcPrice} USD`)
+//   })
+// })
 
 router.post("/session/:deviceId", (req, res) => {
   Device.findOne({deviceId: req.params.deviceId}, (err, device) => {
