@@ -10,7 +10,9 @@ const device = new mongoose.Schema({
   preferredCurrency: {type: String, default: ""},
   lastSessionEpochTime: {type: String, default: ""},
   activeWithinLastWeek: {type: Boolean, default: false},
-  activeWithinLastDay: {type: Boolean, defauly: false}
+  activeWithinLastDay: {type: Boolean, defauly: false},
+  volatilityAlerts2: {type: [{type: String}], default: []},
+  balanceValueInNativeCurrency: {type: Number, default: 0}
 })
 
 const Device = mongoose.model("Device", device);
