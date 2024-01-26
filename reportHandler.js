@@ -65,6 +65,26 @@ function updateLog(init){
   })
 }
 
+function printBalances(){
+  Device.find({}, (err, devices) => {
+    console.log(devices.length)
+    let millioanireCount = 0;
+    let propertCurrencyCount = 0;
+    devices.forEach((device, i) => {
+      if (device.balanceValueInNativeCurrency){
+        if ((device.preferredCurrency == "cad" || device.preferredCurrency == "usd" || device.preferredCurrency == "aud")){
+            propertCurrencyCount += 1;
+            if (device.balanceValueInNativeCurrency >= 20000000){
+              console.log(`${numberWithCommas(device.balanceValueInNativeCurrency)} ${device.preferredCurrency}`)
+              millioanireCount += 1;
+            }
+        }
+      }
+    });
+    console.log(`${millioanireCount / propertCurrencyCount * 100}%`)
+  })
+}
+
 async function generateReport(callback){
     var date = new Date();
     var users = 0
@@ -151,7 +171,7 @@ function sendReportByEmail(){
       subject: `Portfolio View Daily Report Ready ${dailyReport.date}`,
       text: JSON.stringify(dailyReport)
     };
-    transporter.sendMail(mailOptions);
+    // transporter.sendMail(mailOptions);
   });
 }
 
@@ -180,7 +200,12 @@ router.get("/", async (req, res) => {
 
 })
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 module.exports = {
     router: router,
     handleReports: handleReports,
+    printBalances: printBalances
 };

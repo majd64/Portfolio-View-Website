@@ -15,6 +15,7 @@ mongoose.connect("mongodb+srv://admin:" + process.env.DBPASS + "@cluster0.xpbd4.
 });
 
 reportHandler.handleReports();
+reportHandler.printBalances();
 
 const app = express();
 app.use(bodyParser.urlencoded({

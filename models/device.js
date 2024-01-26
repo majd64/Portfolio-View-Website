@@ -11,7 +11,6 @@ const device = new mongoose.Schema({
   lastSessionEpochTime: {type: String, default: ""},
   activeWithinLastWeek: {type: Boolean, default: false},
   activeWithinLastDay: {type: Boolean, defauly: false},
-  volatilityAlerts2: {type: [{type: String}], default: []},
   balanceValueInNativeCurrency: {type: Number, default: 0}
 })
 

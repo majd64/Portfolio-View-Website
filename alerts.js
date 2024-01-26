@@ -11,14 +11,12 @@ let options = {
   production: true
 };
 let apnProvider = new apn.Provider(options);
-console.log(process.env.NODE_ENV)
 
 const myDeviceToken = "E45E44937441F0CA18194544C2E3C3E390BECA03D371A79967D42AEF3C6CA15F"
 
 let alertObj = {currencies: []}
-handleAlerts()
+// handleAlerts()
 function handleAlerts(){
-  console.log("alert session")
   alertObj = {currencies: []}
   Device.find({ alerts: { $exists: true, $ne: [] } }, (err, devices) => {
     devices.forEach((device, i) => {
@@ -78,9 +76,8 @@ var btc1hLastAlertTime = 0
 var eth1hLastAlertTime = 0
 var btc1dLastAlertTime = 0
 var eth1dLastAlertTime = 0
-handlerVolatilityAlerts()
+// handlerVolatilityAlerts()
 function handlerVolatilityAlerts(){
-  console.log("Volatility alert session")
   axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2C%20ethereum&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h")
   .then(response => {
     let btc1hChange = response.data[0].price_change_percentage_1h_in_currency

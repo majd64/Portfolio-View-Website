@@ -55,7 +55,6 @@ router.get("/new", (req, res) => {
 })
 
 router.post("/feedback", (req, res) => {
-  console.log(req.body)
   feedback = new Feedback(req.body)
   feedback.save()
   var mailOptions = {
@@ -83,7 +82,6 @@ router.post("/support", (req, res) => {
         message: "An unknown error occured in the server. Please email us at support.portfolioview.ca. Sorry for the inconvenience"
       });
     } else {
-      console.log("email sent");
       res.render("success", {
         message: "Your message was received!"
       });
